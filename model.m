@@ -58,7 +58,7 @@ uss = css.^(1-sigma)./(1-sigma); % steady state utility for initial guess
 tol = 10e-9;
 itermax = 10000;
 
-
+mu=zeros(na,ne);
 %% Capital market clearing for getting r 
 
 % r iteration set-up
