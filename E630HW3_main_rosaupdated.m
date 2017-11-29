@@ -1,24 +1,25 @@
 %% This script solves 630 HW3 - Similar model with Aiyagari(1994)
-function [Gini,var_c,r,constrained]=model( xi,sig_e,noisyoutput )
 
+clear
+clc
 
 %% 1. Setting
 
 global sigma beta xi alpha delta M rho sig_e
 
 % -- Parameters
-%noisyoutput= true;
+noisyoutput= true;
 % Household
 sigma = 2; % % CRRA coefficient
 beta = 0.96; % utility discount factor
-%xi = 0; % borrowing limit coefficient
+xi = 0.5; % borrowing limit coefficient
 % Production
 alpha = 0.36; % capital share
 delta = 0.06; % capital depreciation rate
 % Shock
 M = 5; % number of possible efficiency units
 rho = 0.95; % serial correlation in efficiency shock
-%sig_e = 0.05; % st.d of AR(1) process for efficiency
+sig_e = 0.05; % st.d of AR(1) process for efficiency
 
 % -- Steady State
 rss = 1/beta - 1;
@@ -41,7 +42,27 @@ e = repmat(grid_e, [na 1 na]); % na(asset state) by ne(efficiency) by na(asset c
 abar = -grid_e(1) * wss / rss; % natural borrowing limit
 amin = xi * abar; 
 amax = kss * au;
-grid_a = amin:(amax-amin)/(na-1):amax;
+
+amax4=amax*.25;
+amax2=amax*.5;
+amax34=amax*.75;
+
+dist4=floor(.6*na);
+dist2=floor(.3*na);
+dist34=floor(.05*na);
+distfull=floor(.05*na);
+
+seg1=linspace(amin,amax4,dist4);
+seg2=linspace(amax4,amax2,dist2);
+seg3=linspace(amax2,amax34,dist34);
+seg4=linspace(amax34,amax,distfull);
+
+grid_a=horzcat(seg1,seg2,seg3,seg4);
+
+%grid_a=log10(logspace(amin,amax,na));
+
+
+%grid_a = amin:(amax-amin)/(na-1):amax;
 a2 = repmat(grid_a', [1 ne]); % 2D asset values
 a = repmat(grid_a', [1 ne na]); % na(asset state) by ne(efficiency) by na(asset choice)
 a_prime = zeros(1,1,na);
@@ -58,7 +79,7 @@ uss = css.^(1-sigma)./(1-sigma); % steady state utility for initial guess
 tol = 10e-9;
 itermax = 10000;
 
-mu=zeros(na,ne);
+
 %% Capital market clearing for getting r 
 
 % r iteration set-up
@@ -67,7 +88,7 @@ itermax_r = itermax;
 iter_r = 0;
 found_r = 1;
 dev_r = 10;
-rmin = (1/beta - 1) * 0.7;
+rmin = (1/beta - 1) * 0.9;
 rmax = (1/beta - 1); 
     % (1/beta - 1) * 0.9: excess saving -6.5133
     % (1/beta - 1) * 0.94: excess saving -1.7532
@@ -273,7 +294,6 @@ disp('***********************************************')
 %% Graph 
 
 % Equilibrium 
-%{
 figure(1)
 subplot(2,2,1)
 mesh(grid_a, grid_e, V')
@@ -333,6 +353,4 @@ xlabel('a')
 ylabel('e')
 axis tight
 title('Lambda Distribution')
-%}
-end
 
