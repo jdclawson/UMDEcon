@@ -88,11 +88,11 @@ while devsaving >= tol_r && iter_r < itermax_r
         mu0 = [ones(na/10,ne)/(na/10*ne);zeros(na*9/10,ne)];
         %     mu0 = ones(na,ne)./(na*ne);
     else
-        mu0 = mu; % updating the initial guess
+        mu0 = mu_fin; % updating the initial guess
     end
     
     % Invariant Distribution
-    [mu] = musolve(mu0,index,ne,na,tran,tol_mu,itermax_mu);
+    [mu_fin] = musolve(mu0,index,ne,na,tran,tol_mu,itermax_mu);
     
     %% Check capital market clearing
     if noisyoutput==true
@@ -101,7 +101,7 @@ while devsaving >= tol_r && iter_r < itermax_r
     end
     
     agg_K = K;
-    agg_A = N*sum(sum(mu.*a2));
+    agg_A = N*sum(sum(mu_fin.*a2));
     exsaving = agg_A - agg_K;
     devsaving = abs(exsaving);
     
@@ -165,9 +165,9 @@ end
 
 [ ee ] = euler_error( c_choice, sigma, ne, na, tran, beta, r );
 
-maxee = max(max(mu.*ee));
-minee = min(min(mu.*ee));
-meanee = mean(mean(mu.*ee));
+maxee = max(max(mu_fin.*ee));
+minee = min(min(mu_fin.*ee));
+meanee = mean(mean(mu_fin.*ee));
 
 %% Welfare Change
 % Complete market
@@ -179,7 +179,7 @@ Wfb = 1/(1-beta)*ufb; % aggregate value level
 wfb = Wfb*ones(na,ne); % individual value for each (a,e)
 
 lam = (wfb./V).^(1/(1-sigma)) - 1;
-Lam = sum(sum(lam.*mu));
+Lam = sum(sum(lam.*mu_fin));
 
 % %Maximized steady state value function
 % uss_in = max(uss,[],3);
@@ -190,7 +190,7 @@ Lam = sum(sum(lam.*mu));
 
 %% Gini Coefficient
 % Distribution of H
-H_a = sum(mu,2);
+H_a = sum(mu_fin,2);
 S_a = zeros(1,na+1);
 
 for ii=1:na
@@ -204,7 +204,7 @@ Gini = 1 - num/S_a(na+1);
 
 % Variance of comsumption across agents
 var_c = var(reshape(c_choice,na*ne,1));
-constrained = sum(mu(1,:));
+constrained = sum(mu_fin(1,:));
 
 %% Result
 if noisyoutput==true
@@ -221,7 +221,7 @@ fprintf('Mean Euler (log10)      : %5.6f\n', meanee)
 fprintf('Max Euler (log10)       : %5.6f\n', maxee)
 fprintf('Min Euler (log10)       : %5.6f\n', minee)
 disp(' ')
-fprintf('Aggregate Value         : %5.3f\n', sum(sum(mu.*V)))
+fprintf('Aggregate Value         : %5.3f\n', sum(sum(mu_fin.*V)))
 fprintf('Aggregate Value (CM)    : %5.3f\n', Wfb)
 fprintf('Agg Welfare Gain (CM)   : %5.3f\n', Lam)
 disp(' ')
@@ -264,7 +264,7 @@ axis tight
 title('Consumption')
 
 subplot(2,2,4)
-mesh(grid_a, grid_e, mu')
+mesh(grid_a, grid_e, mu_fin')
 xlabel('a')
 ylabel('e')
 axis tight
