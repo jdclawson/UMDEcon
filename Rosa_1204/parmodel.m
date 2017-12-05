@@ -26,9 +26,16 @@ rmax = (1/beta - 1);
 r = (rmin+rmax)/2;
 
 mu0 = (1/(na*ne))*ones(na,ne);
+if xi ==.2 && sig_e==.04
+dr0=.00001;
+else
 dr0 = 0.0001;
+end
 
 while devsaving >= tol_r && iter_r < itermax_r
+   if xi ==.5 && sig_e==.04
+	r=.040625903
+   end 
     
     exsavingold = exsaving;
     rold = r;
@@ -124,6 +131,9 @@ while devsaving >= tol_r && iter_r < itermax_r
         dr = dr*0.0001;
     end
     
+   if xi ==.5 && sig_e==.04
+	break	
+   end 
     if exsaving > 0
         if noisyoutput==true
             disp(' ')
@@ -231,9 +241,9 @@ fprintf('Fraction of Constrained : %5.3f\n', constrained)
 disp('***********************************************')
 
 else
-disp('')
+disp(' ')
 fprintf('Completed for xi: %5.3f and sig_e: %5.3f', xi, sig_e)
-disp('')
+disp(' ')
 
 end
 
